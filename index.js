@@ -1,5 +1,19 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const express = require('express');
+
+// --- SETUP WEB SERVER AGAR GRATIS DI RENDER ---
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+    res.send('Bot Discord FiveM Ime RP is Online!');
+});
+
+app.listen(PORT, () => {
+    console.log(`Web server berjalan di port ${PORT}`);
+});
+// ---------------------------------------------
 
 const client = new Client({
     intents: [
@@ -19,7 +33,7 @@ client.once('clientReady', () => {
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
 
-    // 1. Perintah untuk melihat SEMUA player online: !players
+    // Perintah !players
     if (message.content === '!players') {
         try {
             const response = await fetch(`${FIVEM_SERVER_URL}/players.json`, {
@@ -62,7 +76,7 @@ client.on('messageCreate', async message => {
         }
     }
 
-    // 2. Perintah BARU untuk MENCARI PLAYER BERDASARKAN NAMA: !cari <nama>
+    // Perintah !cari <nama>
     if (message.content.startsWith('!cari ')) {
         const searchQuery = message.content.slice(6).trim();
         
@@ -80,15 +94,12 @@ client.on('messageCreate', async message => {
             }
             
             const players = await response.json();
-
-            // Melakukan filter nama (tidak case-sensitive, jadi huruf besar/kecil tidak masalah)
             const matchedPlayers = players.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
             if (matchedPlayers.length === 0) {
                 return message.reply(`❌ Tidak ditemukan player dengan nama yang mengandung **"${searchQuery}"**.`);
             }
 
-            // Format hasil pencarian
             const playerList = matchedPlayers.map(p => `• ${p.name} (ID: ${p.id})`).join('\n');
             const description = playerList.length > 4000 
                 ? playerList.substring(0, 4000) + '\n... dan player lainnya.' 
