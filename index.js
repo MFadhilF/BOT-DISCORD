@@ -2,7 +2,7 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const express = require('express');
 
-// --- SETUP WEB SERVER AGAR GRATIS DI RENDER ---
+// Setup web server agar aktif di Render
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -13,7 +13,6 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Web server berjalan di port ${PORT}`);
 });
-// ---------------------------------------------
 
 const client = new Client({
     intents: [
@@ -37,7 +36,11 @@ client.on('messageCreate', async message => {
     if (message.content === '!players') {
         try {
             const response = await fetch(`${FIVEM_SERVER_URL}/players.json`, {
-                signal: AbortSignal.timeout(5000)
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept': 'application/json'
+                },
+                signal: AbortSignal.timeout(7000)
             });
             
             if (!response.ok) {
@@ -46,7 +49,10 @@ client.on('messageCreate', async message => {
             
             const players = await response.json();
             
-            const infoResponse = await fetch(`${FIVEM_SERVER_URL}/info.json`).catch(() => null);
+            const infoResponse = await fetch(`${FIVEM_SERVER_URL}/info.json`, {
+                headers: { 'User-Agent': 'Mozilla/5.0' }
+            }).catch(() => null);
+            
             const info = infoResponse && infoResponse.ok ? await infoResponse.json() : {};
             const maxPlayers = info.vars?.sv_maxclients || '2048';
 
@@ -86,7 +92,11 @@ client.on('messageCreate', async message => {
 
         try {
             const response = await fetch(`${FIVEM_SERVER_URL}/players.json`, {
-                signal: AbortSignal.timeout(5000)
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept': 'application/json'
+                },
+                signal: AbortSignal.timeout(7000)
             });
             
             if (!response.ok) {
